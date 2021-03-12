@@ -1,19 +1,18 @@
-import images from './gallery-items.js'
+import gallery from './gallery-items.js'
 
 
-const imagesContainer = document.querySelector('ul.js-gallery');
+const imagesContainer = document.querySelector('.js-gallery');
 const lightBox = document.querySelector('.js-lightbox');
 const lightBoxImage = document.querySelector('.lightbox__image');
+
 const btnClose = document.querySelector('[data-action="close-lightbox"]');
 const lightBoxOverlay = document.querySelector('.lightbox__overlay');
-const bodyRef = document.querySelector('body');
-const imagesMarkup = createImagesMarkup(images);
+const imagesMarkup = createImagesMarkup(gallery);
 imagesContainer.insertAdjacentHTML('beforeend', imagesMarkup);
 
-
 function createImagesMarkup(images) {
-     return images.map(({ preview, original, description }) => {
-         return `<li class="gallery__item">
+    return images.map(({ preview, original, description }, index) => {
+        return `<li class="gallery__item">
   <a
     class="gallery__link"
     href="${original}"
@@ -23,13 +22,16 @@ function createImagesMarkup(images) {
       src="${preview}"
       data-source="${original}"
       alt="${description}"
+      data-index="${index}"
     />
   </a>
 </li>`;
          
      }).join('');
 }
- 
+
+
+
 function onOpenBtnClick(e) {
     if (e.target.nodeName !== 'IMG') {
         return;
@@ -47,20 +49,48 @@ function onOpenModal(e) {
 function onCloseBtnClick(e) {
     lightBox.classList.remove('is-open');
     lightBoxImage.src = "";
-    lightBoxImage.alt = "";
+    
     
 }
-
-function onEscKeydown(e) {
-    if (e.keyCode !== 27) {
-        return;
-    }
-
-    lightBox.classList.remove('is-open');
-    onOpenModal(e);
+function setNewSrc(step, index) {
+  lightBoxImage.dataset.index = `${index + step}`
+  lightBoxImage.src = gallery[index + step].original
 }
+
+function arrowLeft() {
+  let index = Number(lightBoxImage.dataset.index)
+  if (index === 0) {
+    setNewSrc(0, gallery.length - 1)
+    return
+  }
+  console.log(index);
+  setNewSrc(-1, index)
+}
+
+function arrowRight() {
+  let index = +lightBoxImage.dataset.index
+  if (index === gallery.length - 1) {
+    setNewSrc(0, 0)
+    return
+  }
+  console.log(index);
+  setNewSrc(1, index)
+}
+
 
 imagesContainer.addEventListener('click', onOpenBtnClick);
 btnClose.addEventListener('click', onCloseBtnClick);
 lightBoxOverlay.addEventListener('click', onCloseBtnClick);
-bodyRef.addEventListener('keydown', onEscKeydown);
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        onCloseBtnClick(e);
+    }
+
+    if (e.key === "ArrowLeft") {
+    arrowLeft()
+    }
+    
+    if (e.key === "ArrowRight") {
+    arrowRight()
+    }
+})
