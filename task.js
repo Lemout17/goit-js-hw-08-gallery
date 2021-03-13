@@ -44,6 +44,7 @@ function onOpenBtnClick(e) {
 function onOpenModal(e) {
     lightBoxImage.src = e.target.dataset.source;
     lightBoxImage.alt = e.target.alt;
+    lightBoxImage.dataset.index = e.target.dataset.index;
 }
 
 function onCloseBtnClick(e) {
